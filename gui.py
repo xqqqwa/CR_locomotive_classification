@@ -21,8 +21,10 @@ def pre(x):
     cropped=img.crop((p[0],p[1],p[2],p[3]))
     return cropped,1
 
-def pred(x,iscrop,bri,cot,col,srp):
+def pred(x,iscrop,rot,bri,cot,col,srp):
     img=Image.fromarray(x)
+    img=img.rotate(rot)
+    img=img.crop(img.getbbox())
     img=ImageEnhance.Brightness(img).enhance(bri)
     img=ImageEnhance.Contrast(img).enhance(cot)
     img=ImageEnhance.Color(img).enhance(col)
@@ -54,7 +56,7 @@ def pred(x,iscrop,bri,cot,col,srp):
     return [x,oup]
 demo=gr.Interface(
     fn=pred,
-    inputs=[gr.Image(label='upload .jpg',show_download_button=False),gr.Checkbox(label='Autocrop',value=True),
+    inputs=[gr.Image(label='upload .jpg',show_download_button=False),gr.Checkbox(label='Autocrop',value=True),gr.Slider(minimum=-180,maximum=180,step=1,value=0,label='Rotate'),
             gr.Slider(minimum=0.1,maximum=3,step=0.05,value=1,label='Brightness'),gr.Slider(minimum=0.1,maximum=2,step=0.1,value=1.2,label='Contrast'),
             gr.Slider(minimum=0.1,maximum=2,step=0.1,value=1.2,label='Color'),gr.Slider(minimum=0.5,maximum=4,step=0.1,value=1.5,label='Sharpness')],
     outputs=[gr.Image(label='Processed',show_download_button=False),gr.Label(num_top_classes=3,label='Result')],
